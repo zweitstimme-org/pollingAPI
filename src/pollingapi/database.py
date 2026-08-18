@@ -58,6 +58,10 @@ def _apply_schema_migrations():
         "is_public": "BOOLEAN DEFAULT FALSE",
         "public_exclusion_reason": "TEXT",
     }
+    election_columns = {
+        "date": "DATE",
+        "date_is_estimated": "BOOLEAN",
+    }
 
     with engine.connect() as conn:
         # --- polls_raw incremental columns -----------------------------------
@@ -129,6 +133,15 @@ def _apply_schema_migrations():
                 conn.execute(
                     text("CREATE INDEX IF NOT EXISTS ix_polls_is_public ON polls (is_public)")
                 )
+
+            if "elections" in tables:
+                rows = conn.execute(text("PRAGMA table_info(elections)")).fetchall()
+                election_existing = {row[1] for row in rows}
+                for column_name, column_type in election_columns.items():
+                    if column_name not in election_existing:
+                        conn.execute(
+                            text(f"ALTER TABLE elections ADD COLUMN {column_name} {column_type}")
+                        )
 
             if "parties" in tables:
                 rows = conn.execute(text("PRAGMA table_info(parties)")).fetchall()
@@ -269,6 +282,28 @@ def _apply_schema_migrations():
                 conn.execute(
                     text("CREATE INDEX IF NOT EXISTS ix_polls_is_public ON polls (is_public)")
                 )
+
+            elections_exists = conn.execute(
+                text(
+                    "SELECT 1 FROM information_schema.tables WHERE table_name = 'elections' LIMIT 1"
+                )
+            ).fetchone()
+            if elections_exists:
+                for column_name, column_type in {
+                    "date": "DATE",
+                    "date_is_estimated": "BOOLEAN",
+                }.items():
+                    column = conn.execute(
+                        text(
+                            "SELECT column_name FROM information_schema.columns"
+                            " WHERE table_name = 'elections' AND column_name = :column_name"
+                        ),
+                        {"column_name": column_name},
+                    ).fetchone()
+                    if column is None:
+                        conn.execute(
+                            text(f"ALTER TABLE elections ADD COLUMN {column_name} {column_type}")
+                        )
 
             parties_exists = conn.execute(
                 text("SELECT 1 FROM information_schema.tables WHERE table_name = 'parties' LIMIT 1")

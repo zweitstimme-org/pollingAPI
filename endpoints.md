@@ -366,7 +366,11 @@ Returns the main reference tables in one response. This is useful for clients th
 
 ### `GET /v2/elections`
 
-Lists elections with poll counts and latest publish dates:
+Lists election scopes with poll counts and the **next election date** for that
+scope (`date`, `year`, `date_is_estimated`). Landtag dates come from
+[wahlrecht.de](https://www.wahlrecht.de/umfragen/landtage/). The Bundestag date
+is configured via `FEDERAL_ELECTION_DATE` (default `2029-02-25`, estimated).
+`latest_publish_date` is the newest poll in that scope, not election day.
 
 ```text
 GET /v2/elections
