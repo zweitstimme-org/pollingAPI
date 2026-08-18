@@ -908,7 +908,7 @@ def list_survey_methods(db: DBSession):
 
 @router.get("/elections", tags=["elections"])
 def list_elections(db: DBSession):
-    """List elections with poll counts and latest publish date."""
+    """List elections with poll counts and the next election date."""
     return elections.list_election_summaries(db)
 
 

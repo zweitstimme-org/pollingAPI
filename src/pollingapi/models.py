@@ -117,6 +117,7 @@ class Election(Base):
     year: Mapped[int | None] = mapped_column(Integer)
     scope: Mapped[str | None] = mapped_column(String(50))
     date: Mapped[date | None] = mapped_column(Date, nullable=True)
+    date_is_estimated: Mapped[bool | None] = mapped_column(Boolean, nullable=True)
 
     # Relationships
     polls: Mapped[list[Poll]] = relationship("Poll", back_populates="election")

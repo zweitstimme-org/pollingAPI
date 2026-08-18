@@ -182,6 +182,7 @@ class ElectionBase(BaseModel):
     year: int | None = None
     scope: str | None = None
     date: dt.date | None = None
+    date_is_estimated: bool | None = None
 
 
 class ElectionCreate(ElectionBase):

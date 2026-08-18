@@ -235,6 +235,16 @@ def db_seed():
         logger.info(f"Seeded {count} records into {table}")
 
 
+@app.command(name="elections:refresh-dates")
+def elections_refresh_dates():
+    """Scrape upcoming Landtag/Bundestag dates into election reference rows."""
+    from pollingapi.scraper.election_dates import refresh_election_dates
+
+    db = get_db()
+    updated = refresh_election_dates(db)
+    typer.echo(f"✓ Updated {updated} election date(s)")
+
+
 @app.command(name="db:tables")
 def db_tables():
     """List database tables with row counts."""
@@ -698,6 +708,19 @@ def pipeline_run(
             typer.echo("  ⚠ Zero-poll warnings:")
             for name in run_result.zero_poll_workers:
                 typer.echo(f"    {name}: found no polls, but previous raw polls exist")
+        typer.echo("")
+
+        # -------------------------------------------------------------- election dates
+        typer.echo("=== Refreshing election dates ===")
+        typer.echo("")
+        from pollingapi.scraper.election_dates import refresh_election_dates
+
+        try:
+            updated_dates = refresh_election_dates(db)
+            typer.echo(f"✓ Updated {updated_dates} election date(s)")
+        except Exception as exc:
+            logger.warning("Election date refresh failed: %s", exc)
+            typer.echo(f"⚠ Election date refresh failed: {exc}")
         typer.echo("")
 
         # -------------------------------------------------------------- cleaner

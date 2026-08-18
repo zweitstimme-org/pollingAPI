@@ -102,7 +102,14 @@ uv run pollingapi pipeline:run
 This runs:
 
 ```text
-scrape -> clean -> validate -> export -> report -> archive if S3 is configured
+scrape -> election dates -> clean -> validate -> export -> report -> archive if S3 is configured
+```
+
+Upcoming Landtag dates are scraped from wahlrecht.de on each `pipeline:run`.
+Refresh them alone with:
+
+```bash
+uv run pollingapi elections:refresh-dates
 ```
 
 Use this for scheduled production runs after the database is initialized and
@@ -178,7 +185,7 @@ Important v2 routes:
 - `GET /v2/providers`
 - `GET /v2/survey-methods`
 - `GET /v2/scopes`
-- `GET /v2/elections`
+- `GET /v2/elections` — includes `date` / `year` for the next vote in that scope
 - `GET /v2/validation-reports/summary`
 - `GET /v2/downloads`
 - `GET /v2/archives`
@@ -198,6 +205,8 @@ Common settings:
 - `API_PORT`
 - `SCRAPER_DELAY`
 - `SCRAPER_TIMEOUT`
+- `FEDERAL_ELECTION_DATE` (ISO date, default `2029-02-25`)
+- `FEDERAL_ELECTION_DATE_IS_ESTIMATED` (default `true`)
 - `AWS_ACCESS_KEY_ID`
 - `AWS_SECRET_ACCESS_KEY`
 - `AWS_S3_BUCKET_NAME`
