@@ -18,7 +18,7 @@ dependencies = [
     "greenlet>=3.5.3",
     # Data Processing
     "pandas>=2.2.0",
-    "numpy>=2.0.0",
+    "numpy>=2.5.1",
     # Scraping
     "requests>=2.32.0",
     "beautifulsoup4>=4.15.0",
